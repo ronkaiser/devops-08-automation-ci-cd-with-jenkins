@@ -10,7 +10,7 @@ pipeline {
         stage("init") {
             steps {
                 script {
-                    gv = load "script-syntax.groovy"
+                    gv = load "./java-maven-app/script-syntax.groovy"
                 }
             }    
         }
