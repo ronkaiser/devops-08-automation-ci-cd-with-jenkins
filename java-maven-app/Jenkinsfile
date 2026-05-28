@@ -5,6 +5,9 @@ pipeline {
     tools {
         maven 'maven-3.9'
     }
+    environment {
+        APP_DIR = 'java-maven-app'
+    }
     stages {
         stage("init") {
             steps {
@@ -15,17 +18,20 @@ pipeline {
         }
         stage("build jar") {
             steps {
-                script {
-                    gv.buildJar()
-
+                dir(env.APP_DIR) {
+                    script {
+                        gv.buildJar()
+                    }
                 }
             }
         }
 
         stage("build image") {
             steps {
-                script {
-                    gv.buildImage()
+                dir(env.APP_DIR) {
+                    script {
+                        gv.buildImage()
+                    }
                 }
             }
         }
