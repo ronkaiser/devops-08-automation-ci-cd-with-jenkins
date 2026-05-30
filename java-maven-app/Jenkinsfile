@@ -1,45 +1,24 @@
-def gv
-
 pipeline {   
     agent any
-    tools {
-        maven 'maven-3.9'
-    }
-    environment {
-        APP_DIR = 'java-maven-app'
-    }
     stages {
-        stage("init") {
+        stage("build") {
             steps {
                 script {
-                    gv = load "./java-maven-app/script.groovy"
+                    echo "Building the application..."
                 }
             }
         }
-        stage("build jar") {
+        stage("test") {
             steps {
-                dir(env.APP_DIR) {
-                    script {
-                        gv.buildJar()
-                    }
+                script {
+                    echo "Testing the application..."
                 }
             }
         }
-
-        stage("build image") {
-            steps {
-                dir(env.APP_DIR) {
-                    script {
-                        gv.buildImage()
-                    }
-                }
-            }
-        }
-
         stage("deploy") {
             steps {
                 script {
-                    gv.deployApp()
+                    echo "Deploying the application..."
                 }
             }
         }               
