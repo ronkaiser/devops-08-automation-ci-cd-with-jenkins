@@ -28,11 +28,13 @@ pipeline {
             }
         }
 
-        stage("build image") {
+        stage("build and push image") {
             steps {
                 dir(env.APP_DIR) {
                     script {
                         buildImage 'ronkaiser86/demo-app:jma-3.0'
+                        dockerLogin()
+                        dockerPush 'ronkaiser86/demo-app:jma-3.0'
                     }
                 }
             }
