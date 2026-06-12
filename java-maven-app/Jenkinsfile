@@ -68,18 +68,14 @@ pipeline {
                         passwordVariable: 'GIT_PASSWORD'
                     )]) {
                         sh '''#!/bin/bash
-                            printf '%s\n' '#!/bin/bash' \
-                                'if [ "$1" = get ]; then' \
-                                '    printf "%s\\n" "username=x-access-token"' \
-                                "    printf \"%s\\n\" \"password=$GIT_PASSWORD\"" \
-                                'fi' > .git-credential-helper.sh
-                            chmod +x .git-credential-helper.sh
                             git config user.email "jenkins@example.com"
                             git config user.name "jenkins"
                             git add pom.xml
                             git diff --staged --quiet && exit 0
                             git commit -m "ci: version bump"
-                            git -c "credential.helper=!$PWD/.git-credential-helper.sh" \
+                            GITHUB_USER="${GIT_USERNAME%%@*}"
+                            AUTH=$(printf '%s:%s' "$GITHUB_USER" "$GIT_PASSWORD" | base64 -w 0)
+                            git -c "http.extraHeader=Authorization: Basic $AUTH" \
                                 push "https://$GIT_REPO_HOST" "HEAD:$GIT_COMMIT_BRANCH"
                         '''
                     }
