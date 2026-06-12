@@ -7,7 +7,7 @@ pipeline {
     }
     environment {
         APP_DIR = 'java-maven-app'
-        GIT_REPO_URL = 'https://github.com/ronkaiser/devops-08-automation-ci-cd-with-jenkins.git'
+        GIT_REPO_HOST = 'github.com/ronkaiser/devops-08-automation-ci-cd-with-jenkins.git'
         GIT_COMMIT_BRANCH = 'jenkins-jobs'
     }
     stages {
@@ -62,19 +62,22 @@ pipeline {
         stage('commit version update') {
             steps {
                 dir(env.APP_DIR) {
-                    withCredentials([usernamePassword(
-                        credentialsId: 'github-credentials',
-                        usernameVariable: 'GIT_USERNAME',
-                        passwordVariable: 'GIT_PASSWORD'
-                    )]) {
-                        sh '''
-                            git config user.email "jenkins@example.com"
-                            git config user.name "jenkins"
-                            git add pom.xml
-                            git diff --staged --quiet && exit 0
-                            git commit -m "ci: version bump"
-                            git push "https://${GIT_USERNAME/@/%40}:${GIT_PASSWORD}@${GIT_REPO_URL#https://}" HEAD:${GIT_COMMIT_BRANCH}
-                        '''
+                    script {
+                        withCredentials([usernamePassword(
+                            credentialsId: 'github-credentials',
+                            usernameVariable: 'GIT_USERNAME',
+                            passwordVariable: 'GIT_PASSWORD'
+                        )]) {
+                            env.ENCODED_GIT_USERNAME = GIT_USERNAME.replace('@', '%40')
+                            sh '''
+                                git config user.email "jenkins@example.com"
+                                git config user.name "jenkins"
+                                git add pom.xml
+                                git diff --staged --quiet && exit 0
+                                git commit -m "ci: version bump"
+                                git push "https://$ENCODED_GIT_USERNAME:$GIT_PASSWORD@$GIT_REPO_HOST" HEAD:$GIT_COMMIT_BRANCH
+                            '''
+                        }
                     }
                 }
             }
