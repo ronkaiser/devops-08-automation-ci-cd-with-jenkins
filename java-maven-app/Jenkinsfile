@@ -73,7 +73,7 @@ pipeline {
                             git add pom.xml
                             git diff --staged --quiet && exit 0
                             git commit -m "ci: version bump"
-                            GITHUB_USER="${GIT_USERNAME%%@*}"
+                            GITHUB_USER=$(echo "$GIT_REPO_HOST" | cut -d/ -f2)
                             AUTH=$(printf '%s:%s' "$GITHUB_USER" "$GIT_PASSWORD" | base64 -w 0)
                             git -c "http.extraHeader=Authorization: Basic $AUTH" \
                                 push "https://$GIT_REPO_HOST" "HEAD:$GIT_COMMIT_BRANCH"
