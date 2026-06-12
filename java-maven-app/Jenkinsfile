@@ -67,13 +67,12 @@ pipeline {
                         usernameVariable: 'GIT_USERNAME',
                         passwordVariable: 'GIT_PASSWORD'
                     )]) {
-                        writeFile file: '.git-credential-helper.sh', text: '''#!/bin/bash
-if [ "$1" = get ]; then
-    printf '%s\n' "username=$GIT_USERNAME"
-    printf '%s\n' "password=$GIT_PASSWORD"
-fi
-'''
                         sh '''#!/bin/bash
+                            printf '%s\n' '#!/bin/bash' \
+                                'if [ "$1" = get ]; then' \
+                                '    printf "%s\\n" "username=x-access-token"' \
+                                "    printf \"%s\\n\" \"password=$GIT_PASSWORD\"" \
+                                'fi' > .git-credential-helper.sh
                             chmod +x .git-credential-helper.sh
                             git config user.email "jenkins@example.com"
                             git config user.name "jenkins"
