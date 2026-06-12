@@ -62,22 +62,27 @@ pipeline {
         stage('commit version update') {
             steps {
                 dir(env.APP_DIR) {
-                    script {
-                        withCredentials([usernamePassword(
-                            credentialsId: 'github-credentials',
-                            usernameVariable: 'GIT_USERNAME',
-                            passwordVariable: 'GIT_PASSWORD'
-                        )]) {
-                            env.ENCODED_GIT_USERNAME = GIT_USERNAME.replace('@', '%40')
-                            sh '''
-                                git config user.email "jenkins@example.com"
-                                git config user.name "jenkins"
-                                git add pom.xml
-                                git diff --staged --quiet && exit 0
-                                git commit -m "ci: version bump"
-                                git push "https://$ENCODED_GIT_USERNAME:$GIT_PASSWORD@$GIT_REPO_HOST" HEAD:$GIT_COMMIT_BRANCH
-                            '''
-                        }
+                    withCredentials([usernamePassword(
+                        credentialsId: 'github-credentials',
+                        usernameVariable: 'GIT_USERNAME',
+                        passwordVariable: 'GIT_PASSWORD'
+                    )]) {
+                        writeFile file: '.git-credential-helper.sh', text: '''#!/bin/bash
+if [ "$1" = get ]; then
+    printf '%s\n' "username=$GIT_USERNAME"
+    printf '%s\n' "password=$GIT_PASSWORD"
+fi
+'''
+                        sh '''#!/bin/bash
+                            chmod +x .git-credential-helper.sh
+                            git config user.email "jenkins@example.com"
+                            git config user.name "jenkins"
+                            git add pom.xml
+                            git diff --staged --quiet && exit 0
+                            git commit -m "ci: version bump"
+                            git -c "credential.helper=!$PWD/.git-credential-helper.sh" \
+                                push "https://$GIT_REPO_HOST" "HEAD:$GIT_COMMIT_BRANCH"
+                        '''
                     }
                 }
             }
