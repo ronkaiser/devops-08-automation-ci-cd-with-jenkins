@@ -7,8 +7,6 @@ pipeline {
     }
     environment {
         APP_DIR = 'java-maven-app'
-        GIT_REPO_HOST = 'github.com/ronkaiser/devops-08-automation-ci-cd-with-jenkins.git'
-        GIT_COMMIT_BRANCH = 'jenkins-jobs'
     }
     stages {
         stage('increment version') {
@@ -73,10 +71,10 @@ pipeline {
                             git add pom.xml
                             git diff --staged --quiet && exit 0
                             git commit -m "ci: version bump"
-                            GITHUB_USER=$(echo "$GIT_REPO_HOST" | cut -d/ -f2)
+                            GITHUB_USER=$(git remote get-url origin | sed -n 's#.*github.com[:/]\\([^/]*\\)/.*#\\1#p')
                             AUTH=$(printf '%s:%s' "$GITHUB_USER" "$GIT_PASSWORD" | base64 -w 0)
                             git -c "http.extraHeader=Authorization: Basic $AUTH" \
-                                push "https://$GIT_REPO_HOST" "HEAD:$GIT_COMMIT_BRANCH"
+                                push origin HEAD:jenkins-jobs
                         '''
                     }
                 }
