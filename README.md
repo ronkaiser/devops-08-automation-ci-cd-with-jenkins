@@ -19,13 +19,27 @@
 
 ---
 
-## Overview
+## Description
 
 This repository is the **application and pipeline code** for Module 8 of the DevOps Bootcamp. It contains a small **Spring Boot** Java application (`java-maven-app`) and several **Jenkinsfile** variants that progress from basic Pipeline syntax to a full **CI pipeline** with **dynamic versioning**, **Docker image build/push**, and **Git write-back**.
 
 The work mirrors a typical company setup: a dedicated Jenkins server, credentials for external systems, Pipeline as Code in Git, container images published to a registry, and automation triggered on code changes.
 
 **Related repository:** reusable pipeline steps live in a separate [jenkins-shared-library](https://github.com/ronkaiser/jenkins-shared-library) Git repo (see branch `jenkins-shared-lib` in this project for integration example).
+
+## Prerequisites
+
+Before reproducing this project on a new Jenkins server or cloning for local development:
+
+- **DigitalOcean Droplet** (or other Linux host) for Jenkins
+- **Docker** and **Docker Compose** on the Jenkins host (Jenkins runs as a container; the agent needs Docker for image build/push)
+- **GitHub** repository with **webhook** access to your Jenkins URL
+- **Docker Hub** account (or private registry) for image push
+- **Java 17** and **Maven 3.9+** on the agent, aligned with [java-maven-app/pom.xml](./java-maven-app/pom.xml)
+- Jenkins **Global Tool Configuration** for Maven (tool name must match the Jenkinsfile on your branch, e.g. `Maven` on `jenkins-jobs`)
+- Jenkins **credentials** (Global scope): `docker-hub-repo`, `github-pat-devops-08` (and `github-credentials` on some branches)—see [Jenkins configuration](#jenkins-configuration-checklist) below
+
+**Example application:** [java-maven-app](./java-maven-app/)
 
 ---
 
@@ -190,18 +204,9 @@ java -jar target/java-maven-app-*.jar
 
 ---
 
-## Prerequisites
-
-- DigitalOcean Droplet (or other Linux host) for Jenkins
-- Docker and Docker Compose on the Jenkins host
-- GitHub repository with webhook access to your Jenkins URL
-- Docker Hub account (or private registry) for image push
-- Java **17** and Maven **3.9+** aligned with [pom.xml](./java-maven-app/pom.xml)
-
----
-
 ## References
 
+- README structure guidance: [Make a README](https://www.makeareadme.com/)
 - Jenkins: [Pipeline](https://www.jenkins.io/doc/book/pipeline/), [Shared Libraries](https://www.jenkins.io/doc/book/pipeline/shared-libraries/), [Credentials](https://www.jenkins.io/doc/book/using/using-credentials/)
 - GitHub: [Managing personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
 - Docker: [docker build](https://docs.docker.com/reference/cli/docker/build/), [docker push](https://docs.docker.com/reference/cli/docker/push/)
