@@ -53,6 +53,7 @@ pipeline {
                 dir(env.APP_DIR) {
                     script {
                         echo 'deploying docker image...'
+                        echo 'test'
                     }
                 }
             }
